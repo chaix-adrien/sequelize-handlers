@@ -100,7 +100,9 @@ class ModelHandler {
 					throw res.status(404).json({ error: "uuid not found", uuid: req.params.uuid })
 				}
 
-				return row.update(req.body)
+				return row.update(req.body).catch(e => {
+					throw res.status(400).json({ error: e })
+				})
 			}
 
 			function respond(row) {
