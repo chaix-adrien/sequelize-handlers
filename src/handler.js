@@ -33,7 +33,7 @@ class ModelHandler {
 
 			function respond(row) {
 				if (!row) {
-					throw res.status(404).json({ error: "uuid not found", uuid: req.params.uuid })
+					throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
 				}
 
 				res.send(res.transform(row))
@@ -74,7 +74,7 @@ class ModelHandler {
 
 			function destroy(row) {
 				if (!row) {
-					throw res.status(404).json({ error: "uuid not found", uuid: req.params.uuid })
+					throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
 				}
 
 				return row.destroy()
@@ -97,7 +97,7 @@ class ModelHandler {
 
 			function updateAttributes(row) {
 				if (!row) {
-					throw res.status(404).json({ error: "uuid not found", uuid: req.params.uuid })
+					throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
 				}
 
 				return row.update(req.body).catch(e => {
