@@ -120,10 +120,7 @@ class ModelHandler {
 	findAndCountAll(params, options) {
 		let parsed = parse(params, this.model)
 
-		options = _(parsed)
-			.defaults(this.defaults)
-			.merge(options)
-			.value()
+		options = { ...options, ...parsed }
 
 		return this.model.findAndCountAll(options).then(extract)
 
