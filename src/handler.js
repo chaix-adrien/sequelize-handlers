@@ -120,7 +120,7 @@ class ModelHandler {
 	findAndCountAll(params, options) {
 		let parsed = parse(params, this.model)
 
-		options = { ...options, ...parsed, where: options.where ? { ...options.where } : undefined }
+		options = { ...options, ...parsed, where: options ? { ...options.where } : undefined }
 
 		return this.model.findAndCountAll(options).then(extract)
 
