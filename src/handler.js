@@ -123,12 +123,13 @@ class ModelHandler {
 
 		options = { ...options, ...parsed, ...this.defaults, where: options ? { ...options.where } : undefined }
 		options.distinct = true
-		options.limit = params.limit
-		options.offset = (params.page - 1) * params.limit
+		if (!isNaN(params.limit)) options.limit = params.limit
+		if (!isNaN(params.limit)) options.offset = (params.page - 1) * params.limit
 		return this.model.findAndCountAll(options).then(extract)
 		function extract({ count, rows }) {
 			const itemCount = count
 			const pageCount = Math.ceil(count / req.query.limit)
+			if (isNaN(params.limit)) return { rows }
 			return {
 				rows: {
 					data: rows,
