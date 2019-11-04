@@ -2,6 +2,7 @@ const _ = require("lodash")
 const { HttpStatusError } = require("./errors")
 const { parse } = require("./parser")
 const { raw } = require("./transforms")
+const paginate = require("express-paginate")
 
 class ModelHandler {
 	constructor(model, defaults = { limit: 50, offset: 0 }) {
@@ -122,13 +123,18 @@ class ModelHandler {
 
 		options = { ...options, ...parsed, ...this.defaults, where: options ? { ...options.where } : undefined }
 
+		console.log("query", req.query)
 		return this.model.findAndCountAll(options).then(extract)
-
 		function extract({ count, rows }) {
-			const start = options.offset
-			const end = Math.min(count, options.offset + options.limit)
-
-			return { rows, start, end, count }
+			console.log("COUNT", count)
+			const itemCount = count
+			const pageCount = Math.ceil(count / req.query.limit)
+			return {
+				data: rows,
+				pageCount,
+				itemCount,
+				pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+			}
 		}
 	}
 }
