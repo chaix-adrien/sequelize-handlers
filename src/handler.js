@@ -123,6 +123,7 @@ class ModelHandler {
 
 		options = { ...options, ...parsed, ...this.defaults, where: options ? { ...options.where } : undefined }
 		options.distinct = true
+		options.limit = params.limit
 		options.offset = (params.page - 1) * params.limit
 		return this.model.findAndCountAll(options).then(extract)
 		function extract({ count, rows }) {
