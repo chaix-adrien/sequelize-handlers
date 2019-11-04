@@ -46,7 +46,7 @@ class ModelHandler {
 
 	query() {
 		const handle = (req, res, next) => {
-			this.findAndCountAll(req.query, req.options)
+			this.findAndCountAll(req.query, req.options, req)
 				.then(respond)
 				.catch(next)
 
@@ -118,11 +118,11 @@ class ModelHandler {
 		return this.model.findOne(options)
 	}
 
-	findAndCountAll(params, options) {
+	findAndCountAll(params, options, req) {
 		let parsed = parse(params, this.model)
 
 		options = { ...options, ...parsed, ...this.defaults, where: options ? { ...options.where } : undefined }
-
+		options.distinct = true
 		console.log("query", req.query)
 		return this.model.findAndCountAll(options).then(extract)
 		function extract({ count, rows }) {
@@ -130,10 +130,17 @@ class ModelHandler {
 			const itemCount = count
 			const pageCount = Math.ceil(count / req.query.limit)
 			return {
-				data: rows,
-				pageCount,
-				itemCount,
-				pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+				rows: {
+					data: rows,
+					pageCount,
+					itemCount,
+					hasPrevious: paginate.hasPreviousPages,
+					hasNext: paginate.hasNextPages(req)(pageCount),
+					pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+				},
+				start: 0,
+				end: itemCount,
+				count: count,
 			}
 		}
 	}
