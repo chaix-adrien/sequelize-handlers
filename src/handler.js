@@ -122,7 +122,7 @@ class ModelHandler {
 		let parsed = parse(params, this.model)
 
 		options = { ...options, ...parsed, ...this.defaults, where: options ? { ...options.where } : undefined }
-		options.distinct = true
+		if (!isNaN(params.limit)) options.distinct = true
 		if (!isNaN(params.limit)) options.limit = params.limit
 		if (!isNaN(params.limit)) options.offset = (params.page - 1) * params.limit
 		return this.model.findAndCountAll(options).then(extract)
