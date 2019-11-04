@@ -123,17 +123,17 @@ class ModelHandler {
 
 		options = { ...options, ...parsed, ...this.defaults, where: options ? { ...options.where } : undefined }
 		options.distinct = true
-		console.log("query", req.query)
+		options.offset = (params.page - 1) * params.limit
 		return this.model.findAndCountAll(options).then(extract)
 		function extract({ count, rows }) {
-			console.log("COUNT", count)
 			const itemCount = count
 			const pageCount = Math.ceil(count / req.query.limit)
 			return {
 				rows: {
 					data: rows,
-					pageCount,
-					itemCount,
+					pageTotal: pageCount,
+					itemTotal: itemCount,
+					currentPage: req.query.page,
 					hasPrevious: paginate.hasPreviousPages,
 					hasNext: paginate.hasNextPages(req)(pageCount),
 					pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
