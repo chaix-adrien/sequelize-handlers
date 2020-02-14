@@ -58,8 +58,12 @@ class ModelHandler {
 				} else {
 					res.status(200)
 				}
-
-				res.send(res.transform(rows))
+				if (res.transformAsync) {
+					res.transformAsync(rows).then(transformed => {
+						res.send(transformed)
+					})
+				} else
+					res.send(res.transform(rows))
 			}
 		}
 
