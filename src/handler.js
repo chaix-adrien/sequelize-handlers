@@ -12,10 +12,7 @@ class ModelHandler {
 
   create() {
     const handle = (req, res, next) => {
-      this.model
-        .create(req.body)
-        .then(respond)
-        .catch(next)
+      this.model.create(req.body).then(respond).catch(next)
 
       function respond(row) {
         res.status(201)
@@ -28,16 +25,14 @@ class ModelHandler {
 
   get() {
     const handle = (req, res, next) => {
-      this.findOne(req.params, req.options)
-        .then(respond)
-        .catch(next)
+      this.findOne(req.params, req.options).then(respond).catch(next)
 
       function respond(row) {
         if (!row) {
           throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
         }
         if (res.transformAsync)
-          res.transformAsync(row).then(transformed => {
+          res.transformAsync(row).then((transformed) => {
             res.send(transformed)
           })
         else res.send(res.transform(row))
@@ -49,9 +44,7 @@ class ModelHandler {
 
   query() {
     const handle = (req, res, next) => {
-      this.findAndCountAll(req.query, req.options, req)
-        .then(respond)
-        .catch(next)
+      this.findAndCountAll(req.query, req.options, req).then(respond).catch(next)
 
       function respond({ rows, start, end, count }) {
         res.set("Content-Range", `${start}-${end}/${count}`)
@@ -62,7 +55,7 @@ class ModelHandler {
           res.status(200)
         }
         if (res.transformAsync) {
-          res.transformAsync(rows).then(transformed => {
+          res.transformAsync(rows).then((transformed) => {
             res.send(transformed)
           })
         } else res.send(res.transform(rows))
@@ -74,10 +67,7 @@ class ModelHandler {
 
   remove() {
     const handle = (req, res, next) => {
-      this.findOne(req.params)
-        .then(destroy)
-        .then(respond)
-        .catch(next)
+      this.findOne(req.params).then(destroy).then(respond).catch(next)
 
       function destroy(row) {
         if (!row) {
@@ -97,10 +87,7 @@ class ModelHandler {
 
   update() {
     const handle = (req, res, next) => {
-      this.findOne(req.params)
-        .then(updateAttributes)
-        .then(respond)
-        .catch(next)
+      this.findOne(req.params, req.options).then(updateAttributes).then(respond).catch(next)
 
       function updateAttributes(row) {
         if (!row) {
