@@ -12,9 +12,10 @@ class ModelHandler {
 
   create() {
     const handle = (req, res, next) => {
-      this.model.create(req.body).then(respond).catch(next)
+      this.model.create(req.body).then(respond).then(next).catch(next)
 
       function respond(row) {
+        req.obj = row
         res.status(201)
         res.send(res.transform(row))
       }
@@ -67,7 +68,7 @@ class ModelHandler {
 
   remove() {
     const handle = (req, res, next) => {
-      this.findOne(req.params).then(destroy).then(respond).catch(next)
+      this.findOne(req.params).then(destroy).then(respond).then(next).catch(next)
 
       function destroy(row) {
         if (!row) {
@@ -78,6 +79,7 @@ class ModelHandler {
       }
 
       function respond() {
+        req.obj = req.params
         res.sendStatus(204)
       }
     }
@@ -87,7 +89,7 @@ class ModelHandler {
 
   update() {
     const handle = (req, res, next) => {
-      this.findOne(req.params, req.options).then(updateAttributes).then(respond).catch(next)
+      this.findOne(req.params, req.options).then(updateAttributes).then(respond).then(next).catch(next)
 
       function updateAttributes(row) {
         if (!row) {
@@ -98,6 +100,7 @@ class ModelHandler {
       }
 
       function respond(row) {
+        req.obj = row
         res.send(res.transform(row))
       }
     }
