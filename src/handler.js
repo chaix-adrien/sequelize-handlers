@@ -12,7 +12,7 @@ class ModelHandler {
 
   create() {
     const handle = (req, res, next) => {
-      this.model.create(req.body).then(respond).then(next).catch(next)
+      this.model.create(req.body).then(respond).then(next).catch(e =>res.json(e))
 
       function respond(row) {
         req.obj = row
@@ -89,7 +89,7 @@ class ModelHandler {
 
   update() {
     const handle = (req, res, next) => {
-      this.findOne(req.params, req.options).then(updateAttributes).then(respond).then(next).catch(next)
+      this.findOne(req.params, req.options).then(updateAttributes).then(respond).then(next).catch(e => res.json(e))
 
       function updateAttributes(row) {
         if (!row) {
