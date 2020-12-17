@@ -11,9 +11,17 @@ class ModelHandler {
   }
 
   create() {
-    const handle = (req, res, next) => {
-      this.model.create(req.body).then(respond).then(next).catch(e =>res.json(e))
-
+    const handle = async (req, res, next) => {
+      {
+        try {
+          var obj = await this.model.create(req.body)
+        obj = await (res.transformAsync ? res.transformAsync(obj, req.body) : Promise.resolve(obj))
+        await respond(obj)
+          return next()
+        } catch (e) {
+          return res.json(e)
+        }
+      }
       function respond(row) {
         req.obj = row
         res.status(201)
@@ -25,18 +33,20 @@ class ModelHandler {
   }
 
   get() {
-    const handle = (req, res, next) => {
-      this.findOne(req.params, req.options).then(respond).catch(next)
-
+    const handle = async (req, res, next) => {
+      try {
+        var obj = await this.model.findOne(req.params, req.options)
+        obj = await (res.transformAsync ? res.transformAsync(obj) : Promise.resolve(obj))
+        await respond(obj)
+        return next()
+      } catch (e) {
+        return res.json(e)
+      }
       function respond(row) {
         if (!row) {
           throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
         }
-        if (res.transformAsync)
-          res.transformAsync(row).then((transformed) => {
-            res.send(transformed)
-          })
-        else res.send(res.transform(row))
+        return res.send(res.transform(row))
       }
     }
 
@@ -44,9 +54,15 @@ class ModelHandler {
   }
 
   query() {
-    const handle = (req, res, next) => {
-      this.findAndCountAll(req.query, req.options, req).then(respond).catch(next)
-
+    const handle = async (req, res, next) => {
+      try {
+        var obj =  await this.model.findAndCountAll(req.query, req.options, req)
+        obj = await (res.transformAsync ? res.transformAsync(obj) : Promise.resolve(obj))
+        await respond(obj)
+        return next()
+      } catch (e) {
+        return res.json(e)
+      }
       function respond({ rows, start, end, count }) {
         res.set("Content-Range", `${start}-${end}/${count}`)
 
@@ -55,11 +71,7 @@ class ModelHandler {
         } else {
           res.status(200)
         }
-        if (res.transformAsync) {
-          res.transformAsync(rows).then((transformed) => {
-            res.send(transformed)
-          })
-        } else res.send(res.transform(rows))
+        return res.send(res.transform(rows))
       }
     }
 
@@ -88,8 +100,16 @@ class ModelHandler {
   }
 
   update() {
-    const handle = (req, res, next) => {
-      this.findOne(req.params, req.options).then(updateAttributes).then(respond).then(next).catch(e => res.json(e))
+    const handle = async (req, res, next) => {
+          try {
+        var obj = await this.model.findOne(req.params, req.options)
+        obj = await updateAttributes(obj)
+        obj = await (res.transformAsync ? res.transformAsync(obj, req.body) : Promise.resolve(obj))
+        await respond(obj)
+        return next()
+      } catch (e) {
+        return res.json(e)
+      }
 
       function updateAttributes(row) {
         if (!row) {
