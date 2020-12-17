@@ -54,15 +54,9 @@ class ModelHandler {
   }
 
   query() {
-    const handle = async (req, res, next) => {
-      try {
-        var obj =  await this.model.findAndCountAll(req.query, req.options, req)
-        obj = await (res.transformAsync ? res.transformAsync(obj) : Promise.resolve(obj))
-        await respond(obj)
-        return next()
-      } catch (e) {
-        return res.json(e)
-      }
+    const handle = (req, res, next) => {
+      this.findAndCountAll(req.query, req.options, req).then(respond).catch(next)
+
       function respond({ rows, start, end, count }) {
         res.set("Content-Range", `${start}-${end}/${count}`)
 
@@ -71,7 +65,11 @@ class ModelHandler {
         } else {
           res.status(200)
         }
-        return res.send(res.transform(rows))
+        if (res.transformAsync) {
+          res.transformAsync(rows).then((transformed) => {
+            res.send(transformed)
+          })
+        } else res.send(res.transform(rows))
       }
     }
 
