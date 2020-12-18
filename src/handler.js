@@ -15,8 +15,8 @@ class ModelHandler {
       {
         try {
           var obj = await this.model.create(req.body)
-        obj = await (res.transformAsync ? res.transformAsync(obj, req.body) : Promise.resolve(obj))
-        await respond(obj)
+          obj = await (res.transformAsync ? res.transformAsync(obj, req.body) : Promise.resolve(obj))
+          await respond(obj)
           return next()
         } catch (e) {
           return res.json(e)
@@ -99,8 +99,8 @@ class ModelHandler {
 
   update() {
     const handle = async (req, res, next) => {
-          try {
-        var obj = await this.model.findOne(req.params, req.options)
+      try {
+        var obj = await this.findOne(req.params, req.options)
         obj = await updateAttributes(obj)
         obj = await (res.transformAsync ? res.transformAsync(obj, req.body) : Promise.resolve(obj))
         await respond(obj)
@@ -113,7 +113,6 @@ class ModelHandler {
         if (!row) {
           throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
         }
-
         return row.update(req.body)
       }
 
