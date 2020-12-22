@@ -19,7 +19,7 @@ class ModelHandler {
           await respond(obj)
           return next()
         } catch (e) {
-          return res.json(e)
+          return res.status(400).json({error: e.parent.sqlMessage})
         }
       }
       function respond(row) {
@@ -40,7 +40,7 @@ class ModelHandler {
         await respond(obj)
         return next()
       } catch (e) {
-        return res.json(e)
+        return res.status(400).json({error: e.parent.sqlMessage})
       }
       function respond(row) {
         if (!row) {
@@ -106,7 +106,7 @@ class ModelHandler {
         await respond(obj)
         return next()
       } catch (e) {
-        return res.json(e)
+        return res.status(400).json({error: e.parent.sqlMessage})
       }
 
       function updateAttributes(row) {
