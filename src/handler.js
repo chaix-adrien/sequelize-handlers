@@ -37,7 +37,7 @@ class ModelHandler {
   get() {
     const handle = async (req, res, next) => {
       try {
-        var obj = await this.model.findOne(req.params, req.options)
+        var obj = await this.findOne(req.params, req.options)
         obj = await (res.transformAsync ? res.transformAsync(obj) : Promise.resolve(obj))
         await respond(obj)
         return next()
