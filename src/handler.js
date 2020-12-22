@@ -1,10 +1,9 @@
 const _ = require("lodash")
-const { HttpStatusError } = require("./errors")
 const { parse } = require("./parser")
 const { raw } = require("./transforms")
 const paginate = require("express-paginate")
 
-const getError = (e) => e.parent ? e.parent.sqlMessage : e.errors
+const getError = (e) =>  (e.parent ? e.parent.sqlMessage : e.errors)
 
 class ModelHandler {
   constructor(model, defaults = { limit: 50, offset: 0 }) {
@@ -42,12 +41,10 @@ class ModelHandler {
         await respond(obj)
         return next()
       } catch (e) {
-        return res.status(400).json({error: getError(e)})
+        return res.status(e.code || 400).json({error: getError(e)})
       }
       function respond(row) {
-        if (!row) {
-          throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
-        }
+        if (!row) throw { code: 404, errors: "id not found", id: req.params.id }
         return res.send(res.transform(row))
       }
     }
@@ -84,7 +81,7 @@ class ModelHandler {
 
       function destroy(row) {
         if (!row) {
-          throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
+          return res.status(404).json({ errors: "id not found", id: req.params.id })
         }
 
         return row.destroy()
@@ -108,13 +105,11 @@ class ModelHandler {
         await respond(obj)
         return next()
       } catch (e) {
-        return res.status(400).json({error: getError(e)})
+        return res.status(e.code || 400).json({error: getError(e)})
       }
 
       function updateAttributes(row) {
-        if (!row) {
-          throw res.status(404).json({ errors: "uuid not found", uuid: req.params.uuid })
-        }
+        if (!row) throw{ code: 404, errors: "id not found", id: req.params.id }
         return row.update(req.body)
       }
 
