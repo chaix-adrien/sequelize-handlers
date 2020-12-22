@@ -4,6 +4,8 @@ const { parse } = require("./parser")
 const { raw } = require("./transforms")
 const paginate = require("express-paginate")
 
+const getError = (e) => e.parent ? e.parent.sqlMessage : e.errors
+
 class ModelHandler {
   constructor(model, defaults = { limit: 50, offset: 0 }) {
     this.model = model
@@ -19,7 +21,7 @@ class ModelHandler {
           await respond(obj)
           return next()
         } catch (e) {
-          return res.status(400).json({error: e.parent.sqlMessage})
+          return res.status(400).json({error: getError(e)})
         }
       }
       function respond(row) {
@@ -40,7 +42,7 @@ class ModelHandler {
         await respond(obj)
         return next()
       } catch (e) {
-        return res.status(400).json({error: e.parent.sqlMessage})
+        return res.status(400).json({error: getError(e)})
       }
       function respond(row) {
         if (!row) {
@@ -106,7 +108,7 @@ class ModelHandler {
         await respond(obj)
         return next()
       } catch (e) {
-        return res.status(400).json({error: e.parent.sqlMessage})
+        return res.status(400).json({error: getError(e)})
       }
 
       function updateAttributes(row) {
